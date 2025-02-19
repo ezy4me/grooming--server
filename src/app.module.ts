@@ -8,10 +8,30 @@ import { ServiceModule } from './modules/service/service.module';
 import { CategoryModule } from './modules/category/category.module';
 import { EmployeeModule } from './modules/employee/employee.module';
 import { DatabaseModule } from './database/database.module';
+import { DatabaseService } from './database/database.service';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [AuthModule, UserModule, AppointmentModule, ServiceModule, CategoryModule, EmployeeModule, DatabaseModule],
+  imports: [
+    AuthModule,
+    UserModule,
+    AppointmentModule,
+    ServiceModule,
+    CategoryModule,
+    EmployeeModule,
+    DatabaseModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+  ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    DatabaseService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}
