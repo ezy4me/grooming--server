@@ -13,6 +13,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { ConfigModule } from '@nestjs/config';
 import { ImageModule } from './modules/image/image.module';
+import { ClientModule } from './modules/client/client.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ImageModule } from './modules/image/image.module';
     DatabaseModule,
     ConfigModule.forRoot({ isGlobal: true }),
     ImageModule,
+    ClientModule,
   ],
   controllers: [AppController],
   providers: [
