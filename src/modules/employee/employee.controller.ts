@@ -56,7 +56,6 @@ export class EmployeeController {
       throw new NotFoundException('Image not found');
     }
 
-    // Убираем кэширование
     res.set({
       'Content-Type': image.type,
       'Content-Disposition': `inline; filename="image-${id}.jpg"`,
