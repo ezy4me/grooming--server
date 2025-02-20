@@ -49,23 +49,25 @@ model Employee {
   id           Int           @id @default(autoincrement())
   fullName     String
   phone        String
-  image        String?
+  image        Image?        @relation(fields: [imageId], references: [id])
   birthday     DateTime
   userId       Int           @unique
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   appointments Appointment[]
+  imageId      Int?          @unique
 }
 
 model Appointment {
   id         Int                  @id @default(autoincrement())
   date       DateTime
   status     String
-  image      String?
+  image      Image?               @relation(fields: [imageId], references: [id])
   createdAt  DateTime             @default(now())
   employeeId Int
   employee   Employee             @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   clients    ClientAppointment[]
   services   AppointmentService[]
+  imageId    Int?                 @unique
 }
 
 model ClientAppointment {
@@ -81,10 +83,11 @@ model Service {
   name         String
   price        Float
   description  String?
-  image        String?
+  image        Image?               @relation(fields: [imageId], references: [id])
   categoryId   Int
   category     Category             @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   appointments AppointmentService[]
+  imageId      Int?                 @unique
 }
 
 model AppointmentService {
@@ -100,4 +103,15 @@ model Category {
   name        String
   description String?
   services    Service[]
+}
+
+model Image {
+  id          Int          @id @default(autoincrement())
+  name        String
+  type        String
+  buffer      Bytes
+  createdAt   DateTime     @default(now())
+  employee    Employee?    @relation
+  appointment Appointment? @relation
+  service     Service?     @relation
 }
