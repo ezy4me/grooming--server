@@ -25,6 +25,7 @@ import { Public } from '@common/decorators';
 export class ServiceController {
   constructor(private readonly serviceService: ServiceService) {}
 
+  @Public()
   @Get()
   async getAllServices(): Promise<Omit<Service, 'image'>[]> {
     return this.serviceService.getAllServices();
@@ -35,6 +36,14 @@ export class ServiceController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<Service | null> {
     return this.serviceService.getServiceById(id);
+  }
+
+  @Public()
+  @Get('/category/:categoryId')
+  async getServiceByCategoryId(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+  ): Promise<Service[] | null> {
+    return this.serviceService.getServiceByCategoryId(categoryId);
   }
 
   @Public()

@@ -12,7 +12,11 @@ export class EmployeeService {
   ) {}
 
   async getAllEmployees(): Promise<Employee[]> {
-    return this.databaseService.employee.findMany();
+    return this.databaseService.employee.findMany({
+      include: {
+        user: true,
+      },
+    });
   }
 
   async getEmployeeById(employeeId: number): Promise<Employee | null> {

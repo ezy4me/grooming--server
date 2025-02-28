@@ -12,12 +12,22 @@ export class ServiceService {
   ) {}
 
   async getAllServices(): Promise<Service[]> {
-    return this.databaseService.service.findMany();
+    return this.databaseService.service.findMany({
+      include: {
+        category: true,
+      },
+    });
   }
 
   async getServiceById(serviceId: number): Promise<Service | null> {
     return this.databaseService.service.findUnique({
       where: { id: serviceId },
+    });
+  }
+
+  async getServiceByCategoryId(categoryId: number): Promise<Service[] | null> {
+    return this.databaseService.service.findMany({
+      where: { categoryId: categoryId },
     });
   }
 
