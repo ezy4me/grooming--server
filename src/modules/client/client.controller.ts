@@ -33,6 +33,13 @@ export class ClientController {
     return this.clientService.getOneClientById(clientId);
   }
 
+  @Get('/user/:userId')
+  async getOneClientByUserId(
+    @Param('userId', ParseIntPipe) userId: number,
+  ): Promise<Client | null> {
+    return this.clientService.getOneClientByUserId(userId);
+  }
+
   @Post()
   async createClient(@Body() clientDto: ClientDto): Promise<Client> {
     return this.clientService.createClient(clientDto);

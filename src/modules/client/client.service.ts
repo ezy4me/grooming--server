@@ -24,6 +24,15 @@ export class ClientService {
     });
   }
 
+  async getOneClientByUserId(userId: number): Promise<Client | null> {
+    return this.databaseService.client.findUnique({
+      where: { userId },
+      include: {
+        user: true,
+      },
+    });
+  }
+
   async createClient(dto: ClientDto): Promise<Client> {
     return this.databaseService.client.create({
       data: {
