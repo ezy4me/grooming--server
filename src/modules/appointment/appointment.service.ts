@@ -23,7 +23,7 @@ export class AppointmentService {
   }
 
   async getAppointmentById(appointmentId: number): Promise<Appointment | null> {
-    return this.databaseService.appointment.findUnique({
+    const appointment = await this.databaseService.appointment.findUnique({
       where: { id: appointmentId },
       include: {
         employee: true,
@@ -32,6 +32,14 @@ export class AppointmentService {
         image: true,
       },
     });
+
+    if (!appointment) {
+      throw new NotFoundException(
+        `Appointment with ID ${appointmentId} not found`,
+      );
+    }
+
+    return appointment;
   }
 
   async createAppointment(
@@ -93,16 +101,10 @@ export class AppointmentService {
         employeeId: dto.employeeId,
         imageId: imageId,
         clients: {
-          deleteMany: {},
-          create: dto.clientIds.map((clientId) => ({
-            client: { connect: { id: clientId } },
-          })),
+          set: dto.clientIds.map((clientId) => ({ id: clientId })),
         },
         services: {
-          deleteMany: {},
-          create: dto.serviceIds.map((serviceId) => ({
-            service: { connect: { id: serviceId } },
-          })),
+          set: dto.serviceIds.map((serviceId) => ({ id: serviceId })),
         },
       },
     });
@@ -128,6 +130,14 @@ export class AppointmentService {
       );
     }
 
-    return this.imageService.getImageById(appointment.imageId);
+    const image = await this.imageService.getImageById(appointment.imageId);
+
+    if (!image || !image.buffer) {
+      throw new NotFoundException(
+        `Image not found for appointment ${appointmentId}`,
+      );
+    }
+
+    return image;
   }
 }
