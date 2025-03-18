@@ -15,7 +15,7 @@ export class AppointmentService {
     return this.databaseService.appointment.findMany({
       include: {
         employee: true,
-        clients: { include: { client: true } },
+        client: true,
         services: { include: { service: true } },
         image: true,
       },
@@ -27,7 +27,7 @@ export class AppointmentService {
       where: { id: appointmentId },
       include: {
         employee: true,
-        clients: { include: { client: true } },
+        client: true,
         services: { include: { service: true } },
         image: true,
       },
@@ -46,7 +46,7 @@ export class AppointmentService {
     dto: AppointmentDto,
     file?: Express.Multer.File,
   ): Promise<Appointment> {
-    let imageId;
+    let imageId: number | null = null;
 
     if (file) {
       const image = await this.imageService.uploadImage(
@@ -54,27 +54,44 @@ export class AppointmentService {
         file.originalname,
         file.mimetype,
       );
-      imageId = image.id;
+      imageId = image.id!;
     }
 
-    return this.databaseService.appointment.create({
+    const appointment = await this.databaseService.appointment.create({
       data: {
         date: new Date(dto.date),
         status: dto.status,
         employeeId: dto.employeeId,
+        clientId: dto.clientId,
         imageId: imageId,
-        clients: {
-          create: dto.clientIds.map((clientId) => ({
-            client: { connect: { id: clientId } },
-          })),
-        },
-        services: {
-          create: dto.serviceIds.map((serviceId) => ({
-            service: { connect: { id: serviceId } },
-          })),
-        },
       },
     });
+
+    await this.databaseService.appointmentService.createMany({
+      data: dto.serviceIds.map((serviceId) => ({
+        appointmentId: appointment.id,
+        serviceId: serviceId,
+      })),
+    });
+
+    const createdAppointment =
+      await this.databaseService.appointment.findUnique({
+        where: { id: appointment.id },
+        include: {
+          employee: true,
+          client: true,
+          services: { include: { service: true } },
+          image: true,
+        },
+      });
+
+    if (!createdAppointment) {
+      throw new NotFoundException(
+        `Appointment with ID ${appointment.id} not found`,
+      );
+    }
+
+    return createdAppointment;
   }
 
   async updateAppointment(
@@ -82,7 +99,7 @@ export class AppointmentService {
     dto: AppointmentDto,
     file?: Express.Multer.File,
   ): Promise<Appointment> {
-    let imageId;
+    let imageId: number | null = null;
 
     if (file) {
       const image = await this.imageService.uploadImage(
@@ -90,8 +107,19 @@ export class AppointmentService {
         file.originalname,
         file.mimetype,
       );
-      imageId = image.id;
+      imageId = image.id!;
     }
+
+    await this.databaseService.appointmentService.deleteMany({
+      where: { appointmentId },
+    });
+
+    await this.databaseService.appointmentService.createMany({
+      data: dto.serviceIds.map((serviceId) => ({
+        appointmentId: appointmentId,
+        serviceId: serviceId,
+      })),
+    });
 
     return this.databaseService.appointment.update({
       where: { id: appointmentId },
@@ -99,13 +127,14 @@ export class AppointmentService {
         date: new Date(dto.date),
         status: dto.status,
         employeeId: dto.employeeId,
+        clientId: dto.clientId,
         imageId: imageId,
-        clients: {
-          set: dto.clientIds.map((clientId) => ({ id: clientId })),
-        },
-        services: {
-          set: dto.serviceIds.map((serviceId) => ({ id: serviceId })),
-        },
+      },
+      include: {
+        employee: true,
+        client: true,
+        services: { include: { service: true } },
+        image: true,
       },
     });
   }

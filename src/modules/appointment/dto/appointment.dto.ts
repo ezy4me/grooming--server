@@ -14,10 +14,9 @@ export class AppointmentDto {
   @IsInt()
   employeeId: number;
 
-  @ApiProperty({ example: [1, 2] })
-  @IsArray()
-  @IsInt({ each: true })
-  clientIds: number[];
+  @ApiProperty({ example: 1 })
+  @IsInt()
+  clientId: number;
 
   @ApiProperty({ example: [3, 4] })
   @IsArray()
