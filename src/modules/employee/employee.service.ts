@@ -61,6 +61,7 @@ export class EmployeeService {
     file?: Express.Multer.File,
   ): Promise<Employee> {
     let imageId;
+    console.log({ ...dto });
 
     if (file) {
       const image = await this.imageService.uploadImage(

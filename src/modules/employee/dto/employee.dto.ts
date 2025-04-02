@@ -13,7 +13,11 @@ export class EmployeeDto {
 
   @ApiProperty()
   @IsOptional()
-  imageId: number;
+  imageId?: number;
+
+  @ApiProperty()
+  @IsOptional()
+  image?: any;
 
   @ApiProperty()
   @IsString()
