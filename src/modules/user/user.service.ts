@@ -27,6 +27,14 @@ export class UserService {
       },
     });
 
+    await this.databaseService.client.create({
+      data: {
+        name: '',
+        phone: '',
+        userId: _user.id,
+      },
+    });
+
     return _user;
   }
 

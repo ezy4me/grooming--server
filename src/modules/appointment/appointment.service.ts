@@ -22,6 +22,18 @@ export class AppointmentService {
     });
   }
 
+  async getAppointmentsByClientId(clientId: number): Promise<Appointment[]> {
+    return this.databaseService.appointment.findMany({
+      where: { clientId },
+      include: {
+        employee: true,
+        client: true,
+        services: { include: { service: true } },
+        image: true,
+      },
+    });
+  }
+
   async getAppointmentById(appointmentId: number): Promise<Appointment | null> {
     const appointment = await this.databaseService.appointment.findUnique({
       where: { id: appointmentId },

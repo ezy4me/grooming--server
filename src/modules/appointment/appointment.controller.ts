@@ -17,7 +17,6 @@ import { Appointment } from '@prisma/client';
 import { AppointmentDto } from './dto/appointment.dto';
 import { ApiTags, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { Response } from 'express';
-
 @ApiTags('appointment')
 @Controller('appointment')
 export class AppointmentController {
@@ -46,6 +45,13 @@ export class AppointmentController {
       'Content-Disposition': `inline; filename="appointment-${id}.jpg"`,
     });
     res.send(image.buffer);
+  }
+
+  @Get('client/:clientId')
+  async getAppointmentsByClientId(
+    @Param('clientId', ParseIntPipe) clientId: number,
+  ): Promise<Appointment[]> {
+    return this.appointmentService.getAppointmentsByClientId(clientId);
   }
 
   @Post()
