@@ -83,4 +83,12 @@ export class AppointmentController {
   ): Promise<Appointment | null> {
     return this.appointmentService.deleteAppointment(id);
   }
+
+  @Post('available-slots')
+  async getAvailableSlots(
+    @Body() availableSlotsRequest: any,
+  ): Promise<string[]> {
+    const { date, employeeId } = availableSlotsRequest;
+    return this.appointmentService.getAvailableSlots(date, employeeId);
+  }
 }

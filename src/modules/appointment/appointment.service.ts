@@ -181,4 +181,57 @@ export class AppointmentService {
 
     return image;
   }
+
+  async getAvailableSlots(date: string, employeeId: number): Promise<string[]> {
+    const startTime = new Date(date);
+    startTime.setHours(9, 0, 0, 0);
+
+    const endTime = new Date(date);
+    endTime.setHours(21, 0, 0, 0);
+
+    const appointments = await this.databaseService.appointment.findMany({
+      where: {
+        employeeId: Number(employeeId),
+        date: {
+          gte: startTime,
+          lte: endTime,
+        },
+      },
+    });
+
+    const availableSlots: string[] = [];
+
+    const isSlotAvailable = (slotTime: Date): boolean => {
+      return !appointments.some((appointment) => {
+        const appointmentStart = new Date(appointment.date);
+        const appointmentEnd = new Date(appointment.date);
+        appointmentEnd.setMinutes(appointmentStart.getMinutes() + 30);
+
+        appointmentStart.setHours(appointmentStart.getHours() - 3);
+        appointmentEnd.setHours(appointmentEnd.getHours() - 3);
+
+        return (
+          (slotTime >= appointmentStart && slotTime < appointmentEnd) ||
+          (slotTime.getTime() + 30 * 60000 > appointmentStart.getTime() &&
+            slotTime.getTime() < appointmentEnd.getTime())
+        );
+      });
+    };
+
+    for (
+      let currentTime = startTime;
+      currentTime < endTime;
+      currentTime.setMinutes(currentTime.getMinutes() + 30)
+    ) {
+      const slot = new Date(currentTime);
+
+      slot.setHours(slot.getHours());
+
+      if (isSlotAvailable(slot)) {
+        availableSlots.push(slot.toLocaleTimeString());
+      }
+    }
+
+    return availableSlots;
+  }
 }
