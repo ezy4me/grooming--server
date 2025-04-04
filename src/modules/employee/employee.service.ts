@@ -102,4 +102,27 @@ export class EmployeeService {
 
     return this.imageService.getImageById(employee.imageId);
   }
+
+  async getEmployeeCalendar(employeeId: number, start: string, end: string) {
+    return this.databaseService.appointment.findMany({
+      where: {
+        employeeId,
+        date: {
+          gte: new Date(start),
+          lte: new Date(end),
+        },
+      },
+      include: {
+        client: true,
+        services: {
+          include: {
+            service: true,
+          },
+        },
+      },
+      orderBy: {
+        date: 'asc',
+      },
+    });
+  }
 }

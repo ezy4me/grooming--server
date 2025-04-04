@@ -97,4 +97,12 @@ export class EmployeeController {
   ): Promise<Employee | null> {
     return this.employeeService.deleteEmployee(id);
   }
+
+  @Post(':id/calendar')
+  async getEmployeeCalendar(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { start: string; end: string },
+  ) {
+    return this.employeeService.getEmployeeCalendar(id, body.start, body.end);
+  }
 }
