@@ -8,15 +8,14 @@ datasource db {
 }
 
 model User {
-  id         Int                      @id @default(autoincrement())
-  email      String                   @unique
-  password   String
-  createdAt  DateTime                 @default(now())
-  role       String
-  client     Client?
-  employee   Employee?
-  emailCodes EmailVerificationCodes[]
-  token      Token[]
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  role      String
+  client    Client?
+  employee  Employee?
+  token     Token[]
 }
 
 model Token {
@@ -25,15 +24,6 @@ model Token {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
   userAgent String
-}
-
-model EmailVerificationCodes {
-  id        Int      @id @default(autoincrement())
-  code      String
-  expiresAt DateTime
-  isUsed    Boolean  @default(false)
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Client {
@@ -61,14 +51,12 @@ model Appointment {
   id         Int                  @id @default(autoincrement())
   date       DateTime
   status     String
-  image      Image?               @relation(fields: [imageId], references: [id])
   createdAt  DateTime             @default(now())
   employeeId Int
-  employee   Employee           @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  employee   Employee             @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   clientId   Int
   client     Client               @relation(fields: [clientId], references: [id], onDelete: Cascade)
   services   AppointmentService[]
-  imageId    Int?                 @unique
 }
 
 // model ClientAppointment {
@@ -84,11 +72,9 @@ model Service {
   name         String
   price        Float
   description  String?
-  image        Image?               @relation(fields: [imageId], references: [id])
   categoryId   Int
   category     Category             @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   appointments AppointmentService[]
-  imageId      Int?                 @unique
 }
 
 model AppointmentService {
@@ -107,12 +93,10 @@ model Category {
 }
 
 model Image {
-  id          Int          @id @default(autoincrement())
-  name        String
-  type        String
-  buffer      Bytes
-  createdAt   DateTime     @default(now())
-  employee    Employee?    @relation
-  appointment Appointment? @relation
-  service     Service?     @relation
+  id        Int       @id @default(autoincrement())
+  name      String
+  type      String
+  buffer    Bytes
+  createdAt DateTime  @default(now())
+  employee  Employee? @relation
 }

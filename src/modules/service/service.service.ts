@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@database/database.service';
 import { Service } from '@prisma/client';
 import { ServiceDto } from './dto/service.dto';
@@ -31,76 +31,28 @@ export class ServiceService {
     });
   }
 
-  async createService(
-    dto: ServiceDto,
-    file?: Express.Multer.File,
-  ): Promise<Service> {
-    let imageId;
-
-    if (file) {
-      const image = await this.imageService.uploadImage(
-        file,
-        file.originalname,
-        file.mimetype,
-      );
-      imageId = image.id;
-    }
-
+  async createService(dto: ServiceDto): Promise<Service> {
     return this.databaseService.service.create({
       data: {
         ...dto,
         categoryId: Number(dto.categoryId),
         price: Number(dto.price),
-        imageId: imageId,
       },
     });
   }
 
-  async updateService(
-    serviceId: number,
-    dto: ServiceDto,
-    file?: Express.Multer.File,
-  ): Promise<Service> {
-    let imageId;
-
-    if (file) {
-      const image = await this.imageService.uploadImage(
-        file,
-        file.originalname,
-        file.mimetype,
-      );
-      imageId = image.id;
-    }
-
+  async updateService(serviceId: number, dto: ServiceDto): Promise<Service> {
     return this.databaseService.service.update({
       where: { id: serviceId },
       data: {
         ...dto,
         categoryId: Number(dto.categoryId),
         price: Number(dto.price),
-        imageId: imageId,
       },
     });
   }
 
   async deleteService(serviceId: number): Promise<Service | null> {
     return this.databaseService.service.delete({ where: { id: serviceId } });
-  }
-
-  async getImageByServiceId(
-    serviceId: number,
-  ): Promise<{ buffer: Buffer; type: string }> {
-    const service = await this.databaseService.service.findUnique({
-      where: { id: serviceId },
-      select: { imageId: true },
-    });
-
-    if (!service?.imageId) {
-      throw new NotFoundException(
-        `Image for service with ID ${serviceId} not found`,
-      );
-    }
-
-    return this.imageService.getImageById(service.imageId);
   }
 }

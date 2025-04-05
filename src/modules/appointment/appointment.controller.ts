@@ -9,14 +9,12 @@ import {
   ParseIntPipe,
   UploadedFile,
   UseInterceptors,
-  Res,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AppointmentService } from './appointment.service';
 import { Appointment } from '@prisma/client';
 import { AppointmentDto } from './dto/appointment.dto';
 import { ApiTags, ApiConsumes, ApiBody } from '@nestjs/swagger';
-import { Response } from 'express';
 @ApiTags('appointment')
 @Controller('appointment')
 export class AppointmentController {
@@ -34,19 +32,6 @@ export class AppointmentController {
     return this.appointmentService.getAppointmentById(id);
   }
 
-  @Get(':id/image')
-  async getImageByAppointmentId(
-    @Param('id', ParseIntPipe) id: number,
-    @Res() res: Response,
-  ): Promise<void> {
-    const image = await this.appointmentService.getImageByAppointmentId(id);
-    res.set({
-      'Content-Type': image.type,
-      'Content-Disposition': `inline; filename="appointment-${id}.jpg"`,
-    });
-    res.send(image.buffer);
-  }
-
   @Get('client/:clientId')
   async getAppointmentsByClientId(
     @Param('clientId', ParseIntPipe) clientId: number,
@@ -62,7 +47,7 @@ export class AppointmentController {
     @UploadedFile() file: Express.Multer.File,
     @Body() appointmentDto: AppointmentDto,
   ): Promise<Appointment> {
-    return this.appointmentService.createAppointment(appointmentDto, file);
+    return this.appointmentService.createAppointment(appointmentDto);
   }
 
   @Put(':id')
@@ -74,7 +59,7 @@ export class AppointmentController {
     @UploadedFile() file: Express.Multer.File,
     @Body() appointmentDto: AppointmentDto,
   ): Promise<Appointment> {
-    return this.appointmentService.updateAppointment(id, appointmentDto, file);
+    return this.appointmentService.updateAppointment(id, appointmentDto);
   }
 
   @Delete(':id')
